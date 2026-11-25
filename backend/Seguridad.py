@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-import bcrypt
+import hashlib
+import hmac
 from backend.ConexionBD import get_connection
 
 @dataclass
@@ -14,15 +15,14 @@ class PermisoDenegadoError(PermissionError):
 
 
 def hash_password(plain_password: str) -> str:
-    salt = bcrypt.gensalt(rounds=12)
-    return bcrypt.hashpw(plain_password.encode("utf-8"), salt).decode("utf-8")
+    """Genera el hash SHA-256 compatible 100% con SHA2(texto, 256) de MySQL."""
+    return hashlib.sha256(plain_password.encode("utf-8")).hexdigest()
 
 
 def verify_password(plain_password: str, stored_hash: str) -> bool:
-    try:
-        return bcrypt.checkpw(plain_password.encode("utf-8"), stored_hash.encode("utf-8"))
-    except ValueError:
-        return False
+    """Compara el hash generado con el guardado en la base de datos."""
+    calculated_hash = hash_password(plain_password)
+    return hmac.compare_digest(calculated_hash, stored_hash)
 
 
 def iniciar_sesion(username: str, password: str) -> SesionUsuario | None:
@@ -58,4 +58,3 @@ def verificar_rol(sesion: SesionUsuario, roles_permitidos: tuple[str, ...]):
         raise PermisoDenegadoError(
             f"Acceso denegado: el rol '{sesion.rol}' no tiene permisos para esta operación."
         )
-
