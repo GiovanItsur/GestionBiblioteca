@@ -48,3 +48,8 @@ UPDATE ejemplares SET estado = 'PRESTADO' WHERE id_ejemplar = 2;
 INSERT INTO prestamos (id_ejemplar, id_lector, id_usuario_registro, fecha_prestamo, fecha_limite, estado)
 VALUES (3, 2, 2, DATE_SUB(NOW(), INTERVAL 10 DAY), DATE_SUB(NOW(), INTERVAL 3 DAY), 'ACTIVO');
 UPDATE ejemplares SET estado = 'PRESTADO' WHERE id_ejemplar = 3;
+
+USE biblioteca_db;
+UPDATE usuarios SET password_hash = SHA2('Admin123!', 256) WHERE username = 'admin';
+UPDATE usuarios SET password_hash = SHA2('Operador123!', 256) WHERE username = 'operador';
+UPDATE usuarios SET password_hash = SHA2('Consulta123!', 256) WHERE username = 'consulta';
